@@ -144,6 +144,17 @@ pip install -e ".[dev]"
 pytest
 ```
 
+## Linting and type checking
+
+```bash
+pip install -e ".[dev]"
+pre-commit install   # runs ruff and mypy automatically on every commit
+pre-commit run --all-files
+```
+
+CI (`.github/workflows/ci.yml`) runs `ruff check`, `ruff format --check`, `mypy`, and the test
+suite across Python 3.9–3.13 on every pull request and on every push to `main`.
+
 ## Contributing
 
 Issues and pull requests are welcome. Please include tests for any behavior change — every
