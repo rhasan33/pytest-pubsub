@@ -41,6 +41,49 @@ future = client.publish(topic_path, b"hello", source="test")
 message_id = future.result()
 ```
 
+## Subscriber usage
+
+`MockSubscriberClient` implements the subset of `google.cloud.pubsub_v1.SubscriberClient` used
+in practice — `subscription_path`, `create_subscription`/`get_subscription`/
+`delete_subscription`, synchronous `pull`, `acknowledge`, `modify_ack_deadline`, and a simplified
+`subscribe()` for streaming-pull-style consumers:
+
+```python
+from pytest_pubsub.registry import PubSubBroker
+from pytest_pubsub.publisher import MockPublisherClient
+from pytest_pubsub.subscriber import MockSubscriberClient
+
+broker = PubSubBroker()
+publisher = MockPublisherClient(broker)
+subscriber = MockSubscriberClient(broker)
+
+topic_path = publisher.topic_path("my-project", "events")
+publisher.create_topic(name=topic_path)
+
+sub_path = subscriber.subscription_path("my-project", "events-sub")
+subscriber.create_subscription(name=sub_path, topic=topic_path)
+
+publisher.publish(topic_path, b"hello")
+
+response = subscriber.pull(subscription=sub_path, max_messages=1)
+message = response.received_messages[0].message
+assert message.data == b"hello"
+message.ack()
+```
+
+Or with a streaming-pull-style callback:
+
+```python
+def handle(message):
+    print(message.data)
+    message.ack()
+
+future = subscriber.subscribe(sub_path, handle)
+# ... later
+future.cancel()
+future.result(timeout=1)
+```
+
 ## Status
 
 Under active development. See below for design notes as functionality lands.
