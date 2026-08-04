@@ -9,6 +9,8 @@ from dataclasses import dataclass, field
 from typing import Deque, Dict, List, Optional, Set, Tuple
 
 from pytest_pubsub.exceptions import AlreadyExists, NotFound
+from pytest_pubsub.subscription import MockSubscription
+from pytest_pubsub.topic import MockTopic
 
 _id_counter = itertools.count(1)
 
@@ -56,6 +58,10 @@ class PubSubBroker:
     def topic_exists(self, name: str) -> bool:
         return name in self._topics
 
+    def get_topic(self, name: str) -> MockTopic:
+        self._require_topic(name)
+        return MockTopic(name=name)
+
     def _require_topic(self, name: str) -> None:
         if name not in self._topics:
             raise NotFound(f"Topic not found: {name}")
@@ -86,6 +92,14 @@ class PubSubBroker:
 
     def subscription_exists(self, name: str) -> bool:
         return name in self._subscriptions
+
+    def get_subscription(self, name: str) -> MockSubscription:
+        state = self._require_subscription(name)
+        return MockSubscription(
+            name=state.name,
+            topic=state.topic,
+            ack_deadline_seconds=state.ack_deadline_seconds,
+        )
 
     def _require_subscription(self, name: str) -> _SubscriptionState:
         if name not in self._subscriptions:
