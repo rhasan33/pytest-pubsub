@@ -84,6 +84,48 @@ future.cancel()
 future.result(timeout=1)
 ```
 
+## pytest fixtures
+
+Installing the package registers a pytest plugin (via the `pytest11` entry point), so these
+fixtures are available in any test suite with no extra configuration:
+
+| Fixture | Description |
+| --- | --- |
+| `pubsub_broker` | Fresh, isolated `PubSubBroker` for the test |
+| `mock_publisher_client` | `MockPublisherClient` bound to `pubsub_broker` |
+| `mock_subscriber_client` | `MockSubscriberClient` bound to the same `pubsub_broker` |
+| `pubsub_topic_factory` | `factory(project, topic) -> MockTopic`, creates the topic |
+| `pubsub_subscription_factory` | `factory(project, subscription, topic_path) -> MockSubscription` |
+
+No monkeypatching happens automatically. Your code under test should accept a client instance
+(constructor injection, a factory function, etc.) so the fixture can be passed in explicitly:
+
+```python
+# app/publisher.py — code under test, accepts an injected client
+def send_event(client, topic_path: str, payload: bytes):
+    future = client.publish(topic_path, payload)
+    return future.result()
+
+# tests/test_publisher.py
+def test_send_event(mock_publisher_client, mock_subscriber_client, pubsub_broker):
+    topic_path = mock_publisher_client.topic_path("proj", "events")
+    mock_publisher_client.create_topic(name=topic_path)
+
+    sub_path = mock_subscriber_client.subscription_path("proj", "events-sub")
+    mock_subscriber_client.create_subscription(name=sub_path, topic=topic_path)
+
+    from app.publisher import send_event
+    message_id = send_event(mock_publisher_client, topic_path, b"hello")
+    assert message_id
+
+    response = mock_subscriber_client.pull(subscription=sub_path, max_messages=1)
+    assert response.received_messages[0].message.data == b"hello"
+    mock_subscriber_client.acknowledge(
+        subscription=sub_path,
+        ack_ids=[response.received_messages[0].ack_id],
+    )
+```
+
 ## Status
 
 Under active development. See below for design notes as functionality lands.
