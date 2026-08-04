@@ -126,6 +126,29 @@ def test_send_event(mock_publisher_client, mock_subscriber_client, pubsub_broker
     )
 ```
 
-## Status
+## Limitations / non-goals
 
-Under active development. See below for design notes as functionality lands.
+- **Client-level mock only.** There is no fake gRPC/HTTP server — this does not emulate the
+  Pub/Sub emulator wire protocol, so it's not a drop-in for tests that talk to the emulator over
+  the network. Code under test must accept a client instance instead of constructing
+  `google.cloud.pubsub_v1.PublisherClient`/`SubscriberClient` directly.
+- **No automatic ack-deadline expiry.** `pull`/`acknowledge` are synchronous and in-process, so
+  messages never redeliver on their own after a deadline; use `message.nack()` or
+  `modify_ack_deadline(..., ack_deadline_seconds=0)` to force redelivery in a test.
+- **No IAM, retention policies, dead-lettering, or push subscriptions.**
+
+## Running the tests
+
+```bash
+pip install -e ".[dev]"
+pytest
+```
+
+## Contributing
+
+Issues and pull requests are welcome. Please include tests for any behavior change — every
+source change in this repo ships with its own tests in the same commit.
+
+## License
+
+MIT
