@@ -24,7 +24,9 @@ class MockPublisherClient:
     def topic_path(project: str, topic: str) -> str:
         return f"projects/{project}/topics/{topic}"
 
-    def create_topic(self, request: Optional[dict] = None, *, name: Optional[str] = None) -> MockTopic:
+    def create_topic(
+        self, request: Optional[dict] = None, *, name: Optional[str] = None
+    ) -> MockTopic:
         topic_name = _extract(request, "name", name)
         self.broker.create_topic(topic_name)
         return self.broker.get_topic(topic_name)
@@ -33,11 +35,15 @@ class MockPublisherClient:
         topic_name = _extract(request, "topic", topic)
         self.broker.delete_topic(topic_name)
 
-    def get_topic(self, request: Optional[dict] = None, *, topic: Optional[str] = None) -> MockTopic:
+    def get_topic(
+        self, request: Optional[dict] = None, *, topic: Optional[str] = None
+    ) -> MockTopic:
         topic_name = _extract(request, "topic", topic)
         return self.broker.get_topic(topic_name)
 
-    def list_topics(self, request: Optional[dict] = None, *, project: Optional[str] = None) -> Iterator[MockTopic]:
+    def list_topics(
+        self, request: Optional[dict] = None, *, project: Optional[str] = None
+    ) -> Iterator[MockTopic]:
         for name in self.broker.list_topics():
             yield self.broker.get_topic(name)
 
@@ -50,9 +56,7 @@ class MockPublisherClient:
     ) -> MockPublishFuture:
         if not isinstance(data, bytes):
             raise TypeError("Data must be sent as bytes")
-        message_id = self.broker.publish(
-            topic, data, attributes=attrs, ordering_key=ordering_key
-        )
+        message_id = self.broker.publish(topic, data, attributes=attrs, ordering_key=ordering_key)
         return MockPublishFuture(message_id)
 
 

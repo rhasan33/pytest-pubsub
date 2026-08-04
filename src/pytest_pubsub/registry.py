@@ -68,9 +68,7 @@ class PubSubBroker:
 
     # -- subscriptions ----------------------------------------------------
 
-    def create_subscription(
-        self, name: str, topic: str, ack_deadline_seconds: int = 10
-    ) -> None:
+    def create_subscription(self, name: str, topic: str, ack_deadline_seconds: int = 10) -> None:
         self._require_topic(topic)
         if name in self._subscriptions:
             raise AlreadyExists(f"Subscription already exists: {name}")

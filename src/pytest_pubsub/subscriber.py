@@ -102,8 +102,8 @@ class MockSubscriberClient:
                     ack_id=ack_id,
                     attributes=queued.attributes,
                     ordering_key=queued.ordering_key,
-                    _ack_fn=lambda aid, sn=sub_name: self.broker.acknowledge(sn, [aid]),
-                    _nack_fn=lambda aid, sn=sub_name: self.broker.nack(sn, [aid]),
+                    _ack_fn=lambda aid: self.broker.acknowledge(sub_name, [aid]),
+                    _nack_fn=lambda aid: self.broker.nack(sub_name, [aid]),
                 ),
             )
             for ack_id, queued in received
