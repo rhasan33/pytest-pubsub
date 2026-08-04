@@ -144,6 +144,17 @@ pip install -e ".[dev]"
 pytest
 ```
 
+Or via the Makefile:
+
+```bash
+make install    # pip install -e ".[dev]"
+make test       # pytest
+make format     # ruff format + ruff check --fix
+make lint       # ruff check
+make typecheck  # mypy
+make check      # lint + typecheck + test
+```
+
 ## Linting and type checking
 
 ```bash
