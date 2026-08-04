@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pytest-pubsub"
+version = "0.1.0"
+description = "In-memory mock of Google Cloud Pub/Sub topics and subscriptions for testing"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+authors = [{ name = "Rakib Hasan Amiya" }]
+urls = { Homepage = "https://rhasan33.github.io/" }
+classifiers = [
+    "Framework :: Pytest",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "google-api-core>=2.0",
+    "pytest>=7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov",
+    "mypy",
+    "ruff",
+    "tox",
+]
+
+[project.entry-points.pytest11]
+pubsub = "pytest_pubsub.plugin"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pytest_pubsub"]
