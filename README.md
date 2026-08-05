@@ -1,5 +1,9 @@
 # pytest-pubsub
 
+[![CI](https://github.com/rhasan33/pytest-pubsub/actions/workflows/ci.yml/badge.svg)](https://github.com/rhasan33/pytest-pubsub/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/pytest-pubsub.svg)](https://pypi.org/project/pytest-pubsub/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 In-memory mock of Google Cloud Pub/Sub topics and subscriptions, for use in tests. No network
 access, no credentials, no emulator process required. Compatible with Python 3.9+.
 
