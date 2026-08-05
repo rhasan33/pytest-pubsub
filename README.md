@@ -78,6 +78,7 @@ def handle(message):
     print(message.data)
     message.ack()
 
+
 future = subscriber.subscribe(sub_path, handle)
 # ... later
 future.cancel()
@@ -106,6 +107,7 @@ def send_event(client, topic_path: str, payload: bytes):
     future = client.publish(topic_path, payload)
     return future.result()
 
+
 # tests/test_publisher.py
 def test_send_event(mock_publisher_client, mock_subscriber_client, pubsub_broker):
     topic_path = mock_publisher_client.topic_path("proj", "events")
@@ -115,6 +117,7 @@ def test_send_event(mock_publisher_client, mock_subscriber_client, pubsub_broker
     mock_subscriber_client.create_subscription(name=sub_path, topic=topic_path)
 
     from app.publisher import send_event
+
     message_id = send_event(mock_publisher_client, topic_path, b"hello")
     assert message_id
 
@@ -140,31 +143,31 @@ def test_send_event(mock_publisher_client, mock_subscriber_client, pubsub_broker
 ## Running the tests
 
 ```bash
-pip install -e ".[dev]"
-pytest
+make install    # uv sync --all-extras
+make test       # uv run pytest --cov=pytest_pubsub
 ```
 
-Or via the Makefile:
+Other Makefile targets:
 
 ```bash
-make install    # pip install -e ".[dev]"
-make test       # pytest
-make format     # ruff format + ruff check --fix
-make lint       # ruff check
-make typecheck  # mypy
-make check      # lint + typecheck + test
+make lint         # ruff check
+make format       # ruff format
+make format-check # ruff format --check
+make typecheck    # mypy --strict
+make check        # lint + format-check + typecheck + test
 ```
 
 ## Linting and type checking
 
 ```bash
-pip install -e ".[dev]"
-pre-commit install   # runs ruff and mypy automatically on every commit
-pre-commit run --all-files
+make install
+uv run pre-commit install   # runs ruff and mypy automatically on every commit
+uv run pre-commit run --all-files
 ```
 
-CI (`.github/workflows/ci.yml`) runs `ruff check`, `ruff format --check`, `mypy`, and the test
-suite across Python 3.9–3.13 on every pull request and on every push to `main`.
+CI (`.github/workflows/ci.yml`) runs `make check` (`ruff check`, `ruff format --check`, `mypy
+--strict`, and the test suite) across Python 3.9–3.14 on every pull request and on every push to
+`main`.
 
 ## Contributing
 

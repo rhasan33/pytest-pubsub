@@ -1,19 +1,21 @@
-.PHONY: install test lint format typecheck check
+.PHONY: install test lint format format-check typecheck check
 
 install:
-	pip install -e ".[dev]"
+	uv sync --all-extras
 
 test:
-	pytest
+	uv run pytest --cov=pytest_pubsub
 
 lint:
-	ruff check src tests
+	uv run ruff check .
 
 format:
-	ruff format src tests
-	ruff check --fix src tests
+	uv run ruff format .
+
+format-check:
+	uv run ruff format --check .
 
 typecheck:
-	mypy src/pytest_pubsub
+	uv run mypy src
 
-check: lint typecheck test
+check: lint format-check typecheck test
