@@ -4,26 +4,33 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pytest-pubsub"
-version = "0.1.0"
+dynamic = ["version"]
 description = "In-memory mock of Google Cloud Pub/Sub topics and subscriptions for testing"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
-authors = [{ name = "Rakib Hasan Amiya" }]
-urls = { Homepage = "https://rhasan33.github.io/" }
+authors = [{ name = "Rakib Hasan Amiya", email = "rhasan.amiya@gmail.com" }]
+keywords = ["pytest", "pubsub", "google-cloud", "testing", "mock"]
 classifiers = [
     "Framework :: Pytest",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
 ]
 dependencies = [
     "google-api-core>=2.0",
     "pytest>=7.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/rhasan33/pytest-pubsub"
+Issues = "https://github.com/rhasan33/pytest-pubsub/issues"
+Changelog = "https://github.com/rhasan33/pytest-pubsub/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
@@ -36,6 +43,9 @@ dev = [
 
 [project.entry-points.pytest11]
 pubsub = "pytest_pubsub.plugin"
+
+[tool.hatch.version]
+path = "src/pytest_pubsub/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pytest_pubsub"]
@@ -51,4 +61,14 @@ select = ["E", "F", "I"]
 [tool.mypy]
 packages = ["pytest_pubsub"]
 mypy_path = "src"
+strict = true
+
+[[tool.mypy.overrides]]
+module = "google.*"
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# google.api_core.exceptions constructors aren't typed; raising them here is
+# the only place that reaches into third-party code we don't control.
+module = "pytest_pubsub.registry"
+disallow_untyped_calls = false

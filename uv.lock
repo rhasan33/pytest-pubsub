@@ -1508,7 +1508,6 @@ wheels = [
 
 [[package]]
 name = "pytest-pubsub"
-version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "google-api-core", version = "2.30.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },

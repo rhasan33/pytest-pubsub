@@ -16,9 +16,9 @@ repos:
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.14.1
+    rev: v2.3.0
     hooks:
       - id: mypy
-        additional_dependencies: [google-api-core]
-        args: [--ignore-missing-imports]
+        additional_dependencies: [google-api-core, pytest]
+        args: [--strict]
         files: ^src/

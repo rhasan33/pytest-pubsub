@@ -5,11 +5,13 @@ from __future__ import annotations
 import threading
 import time
 from dataclasses import dataclass
-from typing import Callable, List, Optional
+from typing import Any, Callable, Dict, List, Optional, TypeVar, cast
 
 from pytest_pubsub.message import MockMessage
 from pytest_pubsub.registry import PubSubBroker
 from pytest_pubsub.subscription import MockSubscription
+
+T = TypeVar("T")
 
 
 @dataclass
@@ -61,7 +63,7 @@ class MockSubscriberClient:
 
     def create_subscription(
         self,
-        request: Optional[dict] = None,
+        request: Optional[Dict[str, Any]] = None,
         *,
         name: Optional[str] = None,
         topic: Optional[str] = None,
@@ -73,20 +75,20 @@ class MockSubscriberClient:
         return self.broker.get_subscription(sub_name)
 
     def delete_subscription(
-        self, request: Optional[dict] = None, *, subscription: Optional[str] = None
+        self, request: Optional[Dict[str, Any]] = None, *, subscription: Optional[str] = None
     ) -> None:
         sub_name = _extract(request, "subscription", subscription)
         self.broker.delete_subscription(sub_name)
 
     def get_subscription(
-        self, request: Optional[dict] = None, *, subscription: Optional[str] = None
+        self, request: Optional[Dict[str, Any]] = None, *, subscription: Optional[str] = None
     ) -> MockSubscription:
         sub_name = _extract(request, "subscription", subscription)
         return self.broker.get_subscription(sub_name)
 
     def pull(
         self,
-        request: Optional[dict] = None,
+        request: Optional[Dict[str, Any]] = None,
         *,
         subscription: Optional[str] = None,
         max_messages: int = 1,
@@ -112,7 +114,7 @@ class MockSubscriberClient:
 
     def acknowledge(
         self,
-        request: Optional[dict] = None,
+        request: Optional[Dict[str, Any]] = None,
         *,
         subscription: Optional[str] = None,
         ack_ids: Optional[List[str]] = None,
@@ -123,7 +125,7 @@ class MockSubscriberClient:
 
     def modify_ack_deadline(
         self,
-        request: Optional[dict] = None,
+        request: Optional[Dict[str, Any]] = None,
         *,
         subscription: Optional[str] = None,
         ack_ids: Optional[List[str]] = None,
@@ -160,9 +162,9 @@ class MockSubscriberClient:
         return StreamingPullFuture(thread, stop_event)
 
 
-def _extract(request: Optional[dict], key: str, explicit):
+def _extract(request: Optional[Dict[str, Any]], key: str, explicit: Optional[T]) -> T:
     if explicit is not None:
         return explicit
     if request is not None and key in request:
-        return request[key]
+        return cast(T, request[key])
     raise TypeError(f"Missing required argument: {key}")

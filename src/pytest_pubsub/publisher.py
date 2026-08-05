@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Iterator, Optional
+from typing import Any, Dict, Iterator, Optional, TypeVar, cast
 
 from pytest_pubsub.message import MockPublishFuture
 from pytest_pubsub.registry import PubSubBroker
 from pytest_pubsub.topic import MockTopic
+
+T = TypeVar("T")
 
 
 class MockPublisherClient:
@@ -25,24 +27,26 @@ class MockPublisherClient:
         return f"projects/{project}/topics/{topic}"
 
     def create_topic(
-        self, request: Optional[dict] = None, *, name: Optional[str] = None
+        self, request: Optional[Dict[str, Any]] = None, *, name: Optional[str] = None
     ) -> MockTopic:
         topic_name = _extract(request, "name", name)
         self.broker.create_topic(topic_name)
         return self.broker.get_topic(topic_name)
 
-    def delete_topic(self, request: Optional[dict] = None, *, topic: Optional[str] = None) -> None:
+    def delete_topic(
+        self, request: Optional[Dict[str, Any]] = None, *, topic: Optional[str] = None
+    ) -> None:
         topic_name = _extract(request, "topic", topic)
         self.broker.delete_topic(topic_name)
 
     def get_topic(
-        self, request: Optional[dict] = None, *, topic: Optional[str] = None
+        self, request: Optional[Dict[str, Any]] = None, *, topic: Optional[str] = None
     ) -> MockTopic:
         topic_name = _extract(request, "topic", topic)
         return self.broker.get_topic(topic_name)
 
     def list_topics(
-        self, request: Optional[dict] = None, *, project: Optional[str] = None
+        self, request: Optional[Dict[str, Any]] = None, *, project: Optional[str] = None
     ) -> Iterator[MockTopic]:
         for name in self.broker.list_topics():
             yield self.broker.get_topic(name)
@@ -60,9 +64,9 @@ class MockPublisherClient:
         return MockPublishFuture(message_id)
 
 
-def _extract(request: Optional[dict], key: str, explicit: Optional[str]) -> str:
+def _extract(request: Optional[Dict[str, Any]], key: str, explicit: Optional[T]) -> T:
     if explicit is not None:
         return explicit
     if request is not None and key in request:
-        return request[key]
+        return cast(T, request[key])
     raise TypeError(f"Missing required argument: {key}")
