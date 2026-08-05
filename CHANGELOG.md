@@ -3,6 +3,15 @@
 All notable changes to this project are documented here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.1.1] - 2026-08-05
+
+### Added
+- `py.typed` marker — the package now advertises inline type information to type checkers.
+
+### Changed
+- Migrated dev/CI tooling from pip+tox to uv; tested/supported Python versions now include 3.14.
+- Enabled strict mypy checking across the package.
+
 ## [0.1.0] - 2026-08-05
 
 Initial release.
